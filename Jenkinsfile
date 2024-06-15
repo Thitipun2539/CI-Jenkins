@@ -13,7 +13,7 @@ pipeline {
         NEXUS_PASS = "admin123" // Nexus repository password
         RELEASE_REPO = "vprofile-release" // Release repository name
         CENTRAL_REPO = "vpro-maven-central" // Central repository name
-        NEXUSIP = "PRIVATE IP OF NEXUS SERVER" // Private IP of Nexus server
+        NEXUSIP = "172.31.60.150" // Private IP of Nexus server
         NEXUSPORT = "8081" // Port number of Nexus server
         NEXUS_GRP_REPO = "vpro-maven-group" // Group repository name in Nexus
         NEXUS_LOGIN = "nexuslogin" // Nexus login credentials (username:password)
