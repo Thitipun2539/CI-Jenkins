@@ -1,3 +1,4 @@
+// Define a map for Slack notification colors based on build status
 def COLOR_MAP = [
     'SUCCESS': 'good', // Slack color code for successful builds
     'FAILURE': 'danger' // Slack color code for failed build
@@ -23,6 +24,11 @@ pipeline {
         NEXUS_LOGIN = "nexuslogin" // Nexus login credentials (username:password)
         SONARSERVER = "sonarserver" // SonarQube server identifier
         SONARSCANNER = "sonarscanner" // SonarQube scanner tool identifier
+        registryCredential = "ecr:<region>:awscreds" // AWS ECR credentials we created in Jenkins
+        appRegistry = "<ECR URI>" // ECR registry URI
+        vprofileRegistry = "https://<URI without image name>" // ECR registry URI without image name
+        cluster = "<clustername>"
+        service = "servicename"
     }
 
     stages {
@@ -102,6 +108,36 @@ pipeline {
                      type: 'war'] // Artifact type
                   ]
                 )
+            }
+        }
+
+        stage("Build App Image") {
+            steps {
+                script {
+                    // Build Docker image for the application
+                    dockerImage = docker.build( appRegistry + ":$BUILD_NUMBER", "./Docker-files/app/multistage")
+                }
+            }
+        }
+
+        stage("Upload App Image") {
+            steps {
+                script {
+                    // Upload Docker image to the registry
+                    docker.withRegistry( vprofileRegistry, registryCredential) {
+                        dockerImage.push("$BUILD_NUMBER") // Push image with build number tag
+                        dockerImage.push('latest') // Push image with latest tag
+                    }
+                }
+            }
+        }
+
+        stage('Deploy to ECS staging') {
+            steps {
+                // Deploy the application to ECS staging cluster
+                withAWS(credentials: 'awscreds', region: 'us-west-1') {
+                    sh 'aws ecs update-service --cluster ${cluster} --service ${service} --force-new-deployment' // Update ECS service to force a new deployment
+                } 
             }
         }
     }

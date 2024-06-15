@@ -3,36 +3,47 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.1.0 http://maven.apache.org/xsd/settings-1.1.0.xsd">
 
+  <!-- Servers configuration for authentication details -->
   <servers>
+    <!-- Configuration for SNAP-REPO server -->
     <server>
-      <id>${SNAP-REPO}</id>
-      <username>${NEXUS-USER}</username>
-      <password>${NEXUS-PASS}</password>
+      <id>${SNAP_REPO}</id>
+      <username>${NEXUS_USER}</username>
+      <password>${NEXUS_PASS}</password>
     </server>
+    
+    <!-- Configuration for RELEASE-REPO server -->
     <server>
-      <id>${RELEASE-REPO}</id>
-      <username>${NEXUS-USER}</username>
-      <password>${NEXUS-PASS}</password>
+      <id>${RELEASE_REPO}</id>
+      <username>${NEXUS_USER}</username>
+      <password>${NEXUS_PASS}</password>
     </server>
-        <server>
-        <id>${CENTRAL-REPO}</id>
-      <username>${NEXUS-USER}</username>
-      <password>${NEXUS-PASS}</password>
-    </server>
+    
+    <!-- Configuration for CENTRAL-REPO server -->
     <server>
-        <id>${NEXUS-GRP-REPO}</id>
-      <username>${NEXUS-USER}</username>
-      <password>${NEXUS-PASS}</password>
+      <id>${CENTRAL_REPO}</id>
+      <username>${NEXUS_USER}</username>
+      <password>${NEXUS_PASS}</password>
+    </server>
+    
+    <!-- Configuration for NEXUS-GRP-REPO server -->
+    <server>
+      <id>${NEXUS_GRP_REPO}</id>
+      <username>${NEXUS_USER}</username>
+      <password>${NEXUS_PASS}</password>
     </server>
   </servers>
 
+  <!-- Mirrors configuration to use a different repository URL for central repository -->
   <mirrors>
+    <!-- Configuration to use NEXUS-GRP-REPO as the mirror for all repositories -->
     <mirror>
-      <id>${CENTRAL-REPO}</id>
-      <name>${CENTRAL-REPO}</name>
-      <url>http://${NEXUSIP}:${NEXUSPORT}/repository/${NEXUS-GRP-REPO}/</url>
+      <id>${CENTRAL_REPO}</id>
+      <name>${CENTRAL_REPO}</name>
+      <url>http://${NEXUSIP}:${NEXUSPORT}/repository/${NEXUS_GRP_REPO}/</url>
       <mirrorOf>*</mirrorOf>
     </mirror>
   </mirrors>
 
 </settings>
+
