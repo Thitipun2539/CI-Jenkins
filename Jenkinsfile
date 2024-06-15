@@ -3,7 +3,7 @@ pipeline {
     // Define the tools required for the pipeline
     tools {
         maven "MAVEN3" // Use the Maven tool named "MAVEN3"
-        jdk “OracleJDK8” // Use the JDK tool named “OracleJDK8”
+        jdk "OracleJDK8" // Use the JDK tool named “OracleJDK8”
     }
 
     environment {
