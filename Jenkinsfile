@@ -24,7 +24,7 @@ pipeline {
         stage('Build') {
             steps {
                 // Execute Maven build command
-                sh 'mvn -s setting.xml -DskipTests install' // Run Maven with custom settings and skip tests
+                sh 'mvn -s settings.xml -DskipTests install' // Run Maven with custom settings and skip tests
             }
         }
     }
