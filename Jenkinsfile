@@ -17,6 +17,8 @@ pipeline {
         NEXUSPORT = "8081" // Port number of Nexus server
         NEXUS_GRP_REPO = "vpro-maven-group" // Group repository name in Nexus
         NEXUS_LOGIN = "nexuslogin" // Nexus login credentials (username:password)
+        SONARSERVER = "sonarserver" // SonarQube server identifier
+        SONARSCANNER = "sonarscanner" // SonarQube scanner tool identifier
     }
 
     stages {
@@ -46,6 +48,25 @@ pipeline {
             steps {
                 // Execute Maven Checkstyle plugin
                 sh 'mvn -s settings.xml checkstyle:checkstyle' // Run Checkstyle analysis to ensure code adheres to standards
+            }
+        }
+
+        stage('Sonar Analysis') {
+            environment {
+                scannerHome = tool "${SONARSCANNER}"
+            }
+            steps {
+                withSonarQubeEnv("${SONARSERVER}") {
+                    // Execute the SonarQube scanner with project-specific properties
+                    sh '''${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=vprofile \
+                    -Dsonar.projectName=vprofile \
+                    -Dsonar.projectVersion=1.0 \
+                    -Dsonar.sources=src/ \
+                    -Dsonar.java.binaries=target/test-classes/com/visualpathit/account/controllerTest/ \
+                    -Dsonar.junit.reportsPath=target/surefire-reports/ \
+                    -Dsonar.jacoco.reportsPath=target/jacoco.exec \
+                    -Dsonar.java.checkstyle.reportPaths=target/checkstyle-result.xml'''
+                }
             }
         }
     }
