@@ -1,9 +1,13 @@
+def COLOR_MAP = [
+    'SUCCESS': 'good', // Slack color code for successful builds
+    'FAILURE': 'danger' // Slack color code for failed build
+]
 pipeline {
     agent any
     // Define the tools required for the pipeline
     tools {
         maven "MAVEN3" // Use the Maven tool named "MAVEN3"
-        jdk "OracleJDK8" // Use the JDK tool named “OracleJDK8”
+        jdk "OracleJDK8" // Use the JDK tool named "OracleJDK8"
     }
 
     environment {
@@ -68,6 +72,46 @@ pipeline {
                     -Dsonar.java.checkstyle.reportPaths=target/checkstyle-result.xml'''
                 }
             }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 1, unit: 'HOURS') {
+                    // Parameter indicates whether to set pipeline to UNSTABLE if Quality Gate fails
+                    // true = set pipeline to UNSTABLE, false = don't
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
+        stage("UploadArtifact"){
+            steps{
+                // Upload artifact to Nexus repository
+                nexusArtifactUploader(
+                  nexusVersion: 'nexus3', // Specify Nexus version
+                  protocol: 'http', // Use HTTP protocol for the upload
+                  nexusUrl: "${NEXUSIP}:${NEXUSPORT}", // Nexus server URL
+                  groupId: 'QA', // Group ID for the artifact
+                  version: "${env.BUILD_ID}-${env.BUILD_TIMESTAMP}", // Use build ID and timestamp as version
+                  repository: "${RELEASE_REPO}", // Target release repository in Nexus
+                  credentialsId: "${NEXUS_LOGIN}", // Credentials ID for authentication
+                  artifacts: [
+                    [artifactId: 'vproapp', // Artifact ID
+                     classifier: '', // No classifier specified
+                     file: 'target/vprofile-v2.war', // Path to the WAR file to be uploaded
+                     type: 'war'] // Artifact type
+                  ]
+                )
+            }
+        }
+    }
+    post {
+        always {
+            // Send a Slack notification after the pipeline completes
+            echo 'Slack Notification.' // Log message indicating Slack notification is being sent
+            slackSend channel: '#devopscicd', // Slack channel to send the notification to
+                color: COLOR_MAP[currentBuild.currentResult], // Set the notification color based on build result
+                message: "*${currentBuild.currentResult}:* Job ${evn.JOB_NAME} build ${env.BUILD_NUMBER} \n More info at: ${evn.BUILD_URL}" // Format the Slack message with build details
         }
     }
 }
