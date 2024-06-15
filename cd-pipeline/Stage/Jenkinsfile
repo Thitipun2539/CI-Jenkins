@@ -19,7 +19,7 @@ pipeline {
         RELEASE_REPO = "vprofile-release" // Release repository name
         CENTRAL_REPO = "vpro-maven-central" // Central repository name
         NEXUSIP = "PRIVATE IP OF NEXUS SERVER" // Private IP of Nexus server
-        NEXUS_PORT = "8081" // Port number of Nexus server
+        NEXUSPORT = "8081" // Port number of Nexus server
         NEXUS_GRP_REPO = "vpro-maven-group" // Group repository name in Nexus
         NEXUS_LOGIN = "nexuslogin" // Nexus login credentials (username:password)
         SONARSERVER = "sonarserver" // SonarQube server identifier
@@ -36,7 +36,7 @@ pipeline {
         stage('Build') {
             steps {
                 // Execute Maven build command
-                sh 'mvn -s setting.xml -DskipTests install' // Run Maven with custom settings and skip tests
+                sh 'mvn -s settings.xml -DskipTests install' // Run Maven with custom settings and skip tests
             }
             post {
                 success {
@@ -50,14 +50,14 @@ pipeline {
         stage('Test') {
             steps {
                 // Execute Maven test command
-                sh 'mvn -s setting.xml test' // Run Maven tests
+                sh 'mvn -s settings.xml test' // Run Maven tests
             }
         }
 
         stage('Checkstyle Analysis') {
             steps {
                 // Execute Maven Checkstyle plugin
-                sh 'mvn -s setting.xml checkstyle:checkstyle' // Run Checkstyle analysis to ensure code adheres to standards
+                sh 'mvn -s settings.xml checkstyle:checkstyle' // Run Checkstyle analysis to ensure code adheres to standards
             }
         }
 
