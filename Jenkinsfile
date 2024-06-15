@@ -1,6 +1,6 @@
 def COLOR_MAP = [
     'SUCCESS': 'good', // Slack color code for successful builds
-    'FAILURE': 'danger' // Slack color code for failed build
+    'FAILURE': 'danger', // Slack color code for failed build
 ]
 pipeline {
     agent any
