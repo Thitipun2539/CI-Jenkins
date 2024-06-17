@@ -26,6 +26,8 @@ pipeline {
         registryCredential = "ecr:us-east-1:awscreds" // AWS ECR credentials we created in Jenkins
         appRegistry = "471112796855.dkr.ecr.us-east-1.amazonaws.com/vprofileappimg" // ECR registry URI
         vprofileRegistry = "https://471112796855.dkr.ecr.us-east-1.amazonaws.com" // ECR registry URI without image name
+        cluster = "vprostaging"
+        service = "vproappstagesvc"
     }
 
     stages {
@@ -126,6 +128,15 @@ pipeline {
                         dockerImage.push('latest') // Push image with latest tag
                     }
                 }
+            }
+        }
+
+        stage('Deploy to ECS staging') {
+            steps {
+                // Deploy the application to ECS staging cluster
+                withAWS(credentials: 'awscreds', region: 'us-west-1') {
+                    sh 'aws ecs update-service --cluster ${cluster} --service ${service} --force-new-deployment' // Update ECS service to force a new deployment
+                } 
             }
         }
     }
