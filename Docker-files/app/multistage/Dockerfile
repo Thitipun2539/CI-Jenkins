@@ -8,7 +8,7 @@ RUN apt update && apt install maven -y
 RUN git clone https://github.com/Thitipun2539/CI-Jenkins.git
 
 # Change directory to the cloned repository, checkout the 'docker' branch, and build the project using Maven
-RUN cd vprofile-project && git checkout docker && mvn install
+RUN cd CI-Jenkins && git checkout docker && mvn install
 
 # Use the official Tomcat 9 image with JRE 11 for the runtime stage
 FROM tomcat:9-jre11
@@ -18,7 +18,7 @@ RUN rm -rf /usr/local/tomcat/webapps/*
 
 # Copy the WAR file built in the build stage to the Tomcat webapps directory and rename it to ROOT.war
 # This will be the main application served by Tomcat
-COPY --from=BUILD_IMAGE vprofile-project/target/vprofile-v2.war /usr/local/tomcat/webapps/ROOT.war
+COPY --from=BUILD_IMAGE CI-Jenkins/target/vprofile-v2.war /usr/local/tomcat/webapps/ROOT.war
 
 # Expose port 8080 for the Tomcat server
 EXPOSE 8080
