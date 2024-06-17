@@ -23,6 +23,9 @@ pipeline {
         NEXUS_LOGIN = "nexuslogin" // Nexus login credentials (username:password)
         SONARSERVER = "sonarserver" // SonarQube server identifier
         SONARSCANNER = "sonarscanner" // SonarQube scanner tool identifier
+        registryCredential = "ecr:us-east-1:awscreds" // AWS ECR credentials we created in Jenkins
+        appRegistry = "471112796855.dkr.ecr.us-east-1.amazonaws.com/vprofileappimg" // ECR registry URI
+        vprofileRegistry = "https://471112796855.dkr.ecr.us-east-1.amazonaws.com" // ECR registry URI without image name
     }
 
     stages {
@@ -102,6 +105,27 @@ pipeline {
                      type: 'war'] // Artifact type
                   ]
                 )
+            }
+        }
+
+        stage("Build App Image") {
+            steps {
+                script {
+                    // Build Docker image for the application
+                    dockerImage = docker.build( appRegistry + ":$BUILD_NUMBER", "./Docker-files/app/multistage")
+                }
+            }
+        }
+
+        stage("Upload App Image") {
+            steps {
+                script {
+                    // Upload Docker image to the registry
+                    docker.withRegistry( vprofileRegistry, registryCredential) {
+                        dockerImage.push("$BUILD_NUMBER") // Push image with build number tag
+                        dockerImage.push('latest') // Push image with latest tag
+                    }
+                }
             }
         }
     }
